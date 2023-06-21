@@ -242,6 +242,7 @@ const Component = ({
           height: height,
           background: color,
           backgroundImage: `url(${image?.url})`,
+          backgroundSize: '100% 100%',
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           backgroundAttachment: "fixed"
