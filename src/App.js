@@ -1,7 +1,9 @@
 import React, { useRef, useState } from "react";
 import Moveable from "react-moveable";
+import useFetchPhotos from "./hooks/useFetchPhotos";
 
 const App = () => {
+  const { photos } = useFetchPhotos();
   const [moveableComponents, setMoveableComponents] = useState([]);
   const [selected, setSelected] = useState(null);
   const containerRef = useRef(null);
@@ -19,6 +21,7 @@ const App = () => {
         width: 100,
         height: 100,
         color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        image: photos[Math.floor(Math.random() * photos.length)],
         updateEnd: true
       },
     ]);
@@ -99,6 +102,7 @@ const Component = ({
   isSelected = false,
   updateEnd,
   containerRef,
+  image
 }) => {
   const ref = useRef();
 
@@ -110,6 +114,7 @@ const Component = ({
     index,
     color,
     id,
+    image
   });
 
   let parent = containerRef.current;
@@ -144,6 +149,7 @@ const Component = ({
       width: newWidth,
       height: newHeight,
       color,
+      image
     });
   
     updateStyles(newWidth, newHeight, adjustedTranslateX, adjustedTranslateY);
@@ -204,6 +210,7 @@ const Component = ({
           width: newWidth,
           height: newHeight,
           color,
+          image
         },
         true
       );
@@ -234,6 +241,10 @@ const Component = ({
           width: width,
           height: height,
           background: color,
+          backgroundImage: `url(${image?.url})`,
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          backgroundAttachment: "fixed"
         }}
         onClick={() => setSelected(id)}
       />
@@ -253,6 +264,7 @@ const Component = ({
             width,
             height,
             color,
+            image
           });
         }}
         onResize={onResize}
