@@ -42,8 +42,8 @@ const App = () => {
   }
 
   return (
-    <main style={{ height: "100vh", width: "100vw" }}>
-      <button onClick={addMoveable}>Add Moveable1</button>
+    <main className="main" style={{ height: "100vh", width: "100vw" }}>
+      <button className="button" onClick={addMoveable}>Add Moveable1</button>
       <div
         id="parent"
         ref={containerRef}

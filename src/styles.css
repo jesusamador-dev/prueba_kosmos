@@ -12,8 +12,8 @@ body{
 }
 
 .main {
-  display: grid;
-  gap: 1em;
+  display: flex;
+  flex-direction: column;
 }
 
 #parent {
@@ -21,12 +21,21 @@ body{
 }
 
 .button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+  display: inline-block;
+  padding: 10px 20px;
+  max-width: fit-content;
+  margin: 50px auto;
+  background-color: #f1f1f1;
   border: none;
-  font-size: 8px;
+  color: #333;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.button:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
