@@ -116,61 +116,65 @@ const Component = ({
   let parentBounds = parent?.getBoundingClientRect();
   
   const onResize = async (e) => {
-      // ACTUALIZAR ALTO Y ANCHO
-      let newWidth = e.width;
-      let newHeight = e.height;
-      
-      const positionMaxTop = top + newHeight;
-      const positionMaxLeft = left + newWidth;
-      
-      if (positionMaxTop > parentBounds?.height)
-        newHeight = parentBounds?.height - top;
-      if (positionMaxLeft > parentBounds?.width)
-        newWidth = parentBounds?.width - left;
-      
-      updateMoveable(id, {
-        top,
-        left,
-        width: newWidth,
-        height: newHeight,
-        color,
-      });
-      const [finalX, finalY] = getLimits(e);
-
-      const adjustedBeforeTranslate = adjustBeforeTranslate(
-        e.drag.beforeTranslate,
-        finalX - e.left,
-        finalY - e.top
-      );
-    
-      updateNodeReference(newHeight, newWidth, adjustedBeforeTranslate);
-    };
-    
-    const adjustBeforeTranslate = (beforeTranslate, deltaX, deltaY) => {
-      const adjustedX = beforeTranslate[0] - deltaX;
-      const adjustedY = beforeTranslate[1] - deltaY;
-      return [adjustedX, adjustedY];
-    };
-
-    const updateNodeReference = (newHeight, newWidth, beforeTranslate) => {
-       // ACTUALIZAR NODO REFERENCIA
-      
-       ref.current.style.width = `${newWidth}px`;
-       ref.current.style.height = `${newHeight}px`;
-       
-       let translateX = beforeTranslate[0];
-       let translateY = beforeTranslate[1];
-       
-       ref.current.style.transform = `translate(${translateX}px, ${translateY}px)`;
-       
-       setNodoReferencia({
-         ...nodoReferencia,
-         translateX,
-         translateY,
-         top: top + translateY < 0 ? 0 : top + translateY,
-         left: left + translateX < 0 ? 0 : left + translateX,
-       });
+    const containerBounds = parent.getBoundingClientRect();
+    const containerLeft = containerBounds.left;
+    const containerTop = containerBounds.top;
+  
+    let newWidth = e.width;
+    let newHeight = e.height;
+  
+    const positionMaxTop = top + newHeight;
+    const positionMaxLeft = left + newWidth;
+  
+    if (positionMaxTop > containerBounds.height - containerTop) {
+      newHeight = containerBounds.height - containerTop - top;
     }
+    if (positionMaxLeft > containerBounds.width - containerLeft) {
+      newWidth = containerBounds.width - containerLeft - left;
+    }
+  
+    const { adjustedTranslateX, adjustedTranslateY } = calculateAdjustedTranslate(e.drag.beforeTranslate, newWidth, newHeight, e);
+  
+    const absoluteTop = top + adjustedTranslateY;
+    const absoluteLeft = left + adjustedTranslateX;
+  
+    updateMoveable(id, {
+      top: absoluteTop,
+      left: absoluteLeft,
+      width: newWidth,
+      height: newHeight,
+      color,
+    });
+  
+    updateStyles(newWidth, newHeight, adjustedTranslateX, adjustedTranslateY);
+    updateNodeReference(absoluteTop, absoluteLeft, adjustedTranslateX, adjustedTranslateY);
+  };
+  
+  const calculateAdjustedTranslate = (beforeTranslate, newWidth, newHeight, e) => {
+    const translateX = beforeTranslate[0];
+    const translateY = beforeTranslate[1];
+  
+    const adjustedTranslateX = translateX > 0 ? Math.min(translateX, newWidth - e.width) : translateX;
+    const adjustedTranslateY = translateY > 0 ? Math.min(translateY, newHeight - e.height) : translateY;
+  
+    return { adjustedTranslateX, adjustedTranslateY };
+  };
+  
+  const updateStyles = (newWidth, newHeight, adjustedTranslateX, adjustedTranslateY) => {
+    ref.current.style.width = `${newWidth}px`;
+    ref.current.style.height = `${newHeight}px`;
+    ref.current.style.transform = `translate(${adjustedTranslateX}px, ${adjustedTranslateY}px)`;
+  };
+  
+  const updateNodeReference = (absoluteTop, absoluteLeft, adjustedTranslateX, adjustedTranslateY) => {
+    setNodoReferencia({
+      ...nodoReferencia,
+      translateX: adjustedTranslateX,
+      translateY: adjustedTranslateY,
+      top: absoluteTop,
+      left: absoluteLeft,
+    });
+  };
     
     
     const onResizeEnd = async (e) => {
